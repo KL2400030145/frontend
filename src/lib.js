@@ -9,7 +9,7 @@ export function callApi(reqMethod, url, data, responseHandler)
     else
         options = {method: reqMethod, headers:{'Content-Type': 'application/json'}, body: data};
 
-    fetch(url, options)
+    fetch(BACKENDURL + url, options)   // ✅ FIXED
         .then((response)=>{
             if(!response.ok)
                 throw new Error(response.status + " " + response.statusText);
