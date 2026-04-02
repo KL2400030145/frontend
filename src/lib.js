@@ -20,7 +20,13 @@ export function callApi(reqMethod, url, data, responseHandler)
             if (!response.ok)
                 throw new Error(response.status + " " + response.statusText);
 
-            return response.json();   // ✅ FIXED (IMPORTANT)
+            const contentType = response.headers.get("content-type");
+
+            if (contentType && contentType.includes("application/json")) {
+                return response.json();
+            } else {
+                return response.text();
+            }
         })
         .then((data) => responseHandler(data))
         .catch((err) => {
