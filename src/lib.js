@@ -2,44 +2,27 @@ export const BACKENDURL = "https://backend-r0hc.onrender.com/dbcrud";
 
 export function callApi(reqMethod, url, data, responseHandler)
 {
-    let options = {
-        method: reqMethod
-    };
+    let options;
 
-    // ✅ For POST / PUT (JSON body)
-    if (reqMethod === "POST" || reqMethod === "PUT")
+    if(reqMethod === "GET" || reqMethod === "DELETE")
     {
-        options.headers = {
-            "Content-Type": "application/json"
-        };
-        options.body = JSON.stringify(data);
+        options = { method: reqMethod };
     }
-
-    // ✅ For PATCH (no body, uses query params)
-    // Example: /updatename/1?sname=John
+    else
+    {
+        options = { 
+            method: reqMethod, 
+            headers: { 'Content-Type': 'application/json' }, 
+            body: JSON.stringify(data)
+        };
+    }
 
     fetch(`${BACKENDURL}${url}`, options)
         .then((response) => {
-            if (!response.ok)
-            {
+            if(!response.ok)
                 throw new Error(response.status + " " + response.statusText);
-            }
-
-            // ✅ Handle both JSON and text responses
-            const contentType = response.headers.get("content-type");
-
-            if (contentType && contentType.includes("application/json"))
-            {
-                return response.json();
-            }
-            else
-            {
-                return response.text();
-            }
+            return response.text();
         })
         .then((data) => responseHandler(data))
-        .catch((err) => {
-            console.error(err);
-            alert(err);
-        });
+        .catch((err) => alert(err));
 }

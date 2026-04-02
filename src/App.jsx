@@ -1,116 +1,111 @@
 import React, { useEffect, useState } from 'react';
 import './App.css';
-import { BACKENDURL, callApi } from './lib';
+import { callApi } from './lib';
 
 const App = () => 
 {
-
   const [name, setName] = useState("");
   const [dept, setDept] = useState("");
   const [sid, setSid] = useState("");
   const [studentData, setStudentData] = useState([]);
   const [savePopup, setSavePopup] = useState(false);
 
-  useEffect(()=>{
+  useEffect(() => {
     loadData();
   }, []);
 
-  function loadData()
-{
-    callApi("GET", BACKENDURL + "getall", "", readResponse);
+  // 🔹 Load all data
+  function loadData() {
+    callApi("GET", "/getall", null, readResponse);
   }
 
-  function readResponse(data)
- {
-    setStudentData(JSON.parse(data));
+  function readResponse(data) {
+    setStudentData(data);
   }
 
-  function saveData()
-  {
-    if(name.trim() === ""){
+  // 🔹 Save
+  function saveData() {
+    if (name.trim() === "") {
       alert("Enter Name");
       return;
     }
 
-    if(dept.trim() === ""){
+    if (dept.trim() === "") {
       alert("Enter Department");
       return;
     }
 
-    let data = JSON.stringify({
+    let data = {
       sname: name,
       sdept: dept
-    });
+    };
 
-    callApi("POST", BACKENDURL + "insert", data, saveResponse);
+    callApi("POST", "/insert", data, saveResponse);
   }
 
-  function saveResponse(data)
- {
+  function saveResponse(data) {
     alert(data);
     closeSaveData();
     loadData();
   }
 
-  function showSaveData()
- {
+  function showSaveData() {
     setName("");
     setDept("");
     setSid("");
     setSavePopup(true);
   }
 
-  function closeSaveData()
-  {
+  function closeSaveData() {
     setSavePopup(false);
   }
 
-  function deleteData(id)
-{
+  // 🔹 Delete
+  function deleteData(id) {
     let res = confirm("Do you want to delete?");
-    if(!res) return;
+    if (!res) return;
 
-    callApi("DELETE", BACKENDURL + "deletebyId/" + id, "", deleteResponse);
+    callApi("DELETE", "/delete/" + id, null, deleteResponse);
   }
 
-  function deleteResponse(data){
+  function deleteResponse(data) {
     alert(data);
     loadData();
   }
 
-  function editData(id){
-    callApi("GET", BACKENDURL + "getbyid/" + id, "", editResponse);
+  // 🔹 Edit
+  function editData(id) {
+    callApi("GET", "/getbyId/" + id, null, editResponse);
   }
 
-  function editResponse(data){
-    let rdata = JSON.parse(data);
-    setSid(rdata.sid);
-    setName(rdata.sname);
-    setDept(rdata.sdept);
+  function editResponse(data) {
+    setSid(data.sid);
+    setName(data.sname);
+    setDept(data.sdept);
     setSavePopup(true);
   }
 
-  function updateData(){
-
-    if(name.trim() === ""){
+  // 🔹 Update
+  function updateData() {
+    if (name.trim() === "") {
       alert("Enter Name");
       return;
     }
 
-    if(dept.trim() === ""){
+    if (dept.trim() === "") {
       alert("Enter Department");
       return;
     }
 
-    let data = JSON.stringify({
+    let data = {
       sname: name,
       sdept: dept
-    });
+    };
 
-    callApi("PUT", BACKENDURL + "updateall/" + sid, data, updateResponse);
+    callApi("PUT", "/updateAll/" + sid, data, updateResponse);
   }
 
-  function updateResponse(data){
+  function updateResponse(data) {
     alert(data);
     closeSaveData();
     loadData();
@@ -119,35 +114,35 @@ const App = () =>
   return (
     <div className='app'>
 
-      {savePopup && 
-      <div className='overlay'>
-        <div className='panel'>
-          <label onClick={closeSaveData}>&times;</label>
-          <h3>Student Details</h3>
+      {savePopup &&
+        <div className='overlay'>
+          <div className='panel'>
+            <label onClick={closeSaveData}>&times;</label>
+            <h3>Student Details</h3>
 
-          <legend>Student Name*</legend>
-          <input 
-            type='text' 
-            placeholder='Enter Name'
-            value={name}
-            onChange={(e)=>setName(e.target.value)}
-          />
+            <legend>Student Name*</legend>
+            <input
+              type='text'
+              placeholder='Enter Name'
+              value={name}
+              onChange={(e) => setName(e.target.value)}
+            />
 
-          <legend>Department*</legend>
-          <input 
-            type='text'
-            placeholder='Enter Department'
-            value={dept}
-            onChange={(e)=>setDept(e.target.value)}
-          />
+            <legend>Department*</legend>
+            <input
+              type='text'
+              placeholder='Enter Department'
+              value={dept}
+              onChange={(e) => setDept(e.target.value)}
+            />
 
-          {sid === "" ?
-            <button onClick={saveData}>Save</button>
-            :
-            <button onClick={updateData}>Update</button>
-          }
+            {sid === "" ?
+              <button onClick={saveData}>Save</button>
+              :
+              <button onClick={updateData}>Update</button>
+            }
+          </div>
         </div>
-      </div>
       }
 
       <div className='header'>Student Details</div>
@@ -163,14 +158,14 @@ const App = () =>
             </tr>
           </thead>
           <tbody>
-            {studentData.map((ele)=>(
+            {studentData.map((ele) => (
               <tr key={ele.sid}>
                 <td>{ele.sid}</td>
                 <td>{ele.sname}</td>
                 <td>{ele.sdept}</td>
                 <td>
-                  <button onClick={()=>editData(ele.sid)}>Edit</button>
-                  <button onClick={()=>deleteData(ele.sid)}>Delete</button>
+                  <button onClick={() => editData(ele.sid)}>Edit</button>
+                  <button onClick={() => deleteData(ele.sid)}>Delete</button>
                 </td>
               </tr>
             ))}
