@@ -2,27 +2,29 @@ export const BACKENDURL = "https://backend-r0hc.onrender.com/dbcrud";
 
 export function callApi(reqMethod, url, data, responseHandler)
 {
-    let options;
+    let options = {
+        method: reqMethod
+    };
 
-    if(reqMethod === "GET" || reqMethod === "DELETE")
+    // POST & PUT → send JSON
+    if (reqMethod === "POST" || reqMethod === "PUT")
     {
-        options = { method: reqMethod };
-    }
-    else
-    {
-        options = { 
-            method: reqMethod, 
-            headers: { 'Content-Type': 'application/json' }, 
-            body: JSON.stringify(data)
+        options.headers = {
+            "Content-Type": "application/json"
         };
+        options.body = JSON.stringify(data);
     }
 
     fetch(`${BACKENDURL}${url}`, options)
         .then((response) => {
-            if(!response.ok)
+            if (!response.ok)
                 throw new Error(response.status + " " + response.statusText);
-            return response.text();
+
+            return response.json();   // ✅ FIXED (IMPORTANT)
         })
         .then((data) => responseHandler(data))
-        .catch((err) => alert(err));
+        .catch((err) => {
+            console.error(err);
+            alert(err);
+        });
 }

@@ -14,7 +14,7 @@ const App = () =>
     loadData();
   }, []);
 
-  // 🔹 Load all data
+  // 🔹 Load all
   function loadData() {
     callApi("GET", "/getall", null, readResponse);
   }
